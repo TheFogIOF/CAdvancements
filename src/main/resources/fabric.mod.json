@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "cadvancements",
+  "version": "${version}",
+  "name": "CAdvancements",
+  "description": "Modify vanilla advancement system.",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/cadvancements/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "sk.thefogiof.cadvancements.client.CadvancementsDataGenerator"
+    ],
+    "client": [
+      "sk.thefogiof.cadvancements.client.CadvancementsClient"
+    ],
+    "main": [
+      "sk.thefogiof.cadvancements.Cadvancements"
+    ]
+  },
+  "mixins": [
+    "cadvancements.mixins.json",
+    {
+      "config": "cadvancements.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}",
+    "betteradvancements": "*"
+  }
+}
