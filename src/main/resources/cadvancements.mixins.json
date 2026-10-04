@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "sk.thefogiof.cadvancements.mixin",
   "compatibilityLevel": "JAVA_25",
+  "plugin": "sk.thefogiof.cadvancements.mixin.CustomAdvancementsMixinPlugin",
   "mixins": [
     "BetterDisplayInfoRegistryMixin",
     "ResourceKeyArgumentMixin",

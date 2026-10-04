@@ -64,7 +64,7 @@ public final class BetterDisplayRegistry {
             DATA.put(id, obj.getAsJsonObject("better_display"));
             //CustomAdvancements.getLogger().info("[CADV] better_display loaded for " + id);
         } catch (Exception e) {
-            CustomAdvancements.getLogger().error("Ошибка чтения {}: {}", file, e.getMessage());
+            CustomAdvancements.getLogger().error("Read error {}: {}", file, e.getMessage());
         }
     }
 }
