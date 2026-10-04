@@ -2,7 +2,7 @@ package sk.thefogiof.cadvancements.compat;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.resources.Identifier;
-import sk.thefogiof.cadvancements.Cadvancements;
+import sk.thefogiof.cadvancements.CustomAdvancements;
 
 import java.io.BufferedReader;
 import java.nio.file.Files;
@@ -21,7 +21,7 @@ public final class BetterDisplayRegistry {
     public static synchronized void reset() {
         DATA.clear();
         loaded = false;
-        Cadvancements.getLogger().info("[CADV] better_display cache reset");
+        CustomAdvancements.getLogger().info("[CADV] better_display cache reset");
     }
 
     public static synchronized JsonObject get(Identifier id) {
@@ -31,7 +31,7 @@ public final class BetterDisplayRegistry {
 
     private static void load() {
         loaded = true;
-        Path root = Cadvancements.ADVANCEMENTS_DIR;
+        Path root = CustomAdvancements.ADVANCEMENTS_DIR;
         if (!Files.isDirectory(root)) return;
 
         try (Stream<Path> stream = Files.walk(root)) {
@@ -39,7 +39,7 @@ public final class BetterDisplayRegistry {
                     .filter(p -> p.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".json"))
                     .forEach(BetterDisplayRegistry::readOne);
         } catch (Exception e) {
-            Cadvancements.getLogger().error("Cant scan better_display {}", String.valueOf(e));
+            CustomAdvancements.getLogger().error("Cant scan better_display {}", String.valueOf(e));
         }
     }
 
@@ -48,23 +48,23 @@ public final class BetterDisplayRegistry {
             JsonObject obj = JsonParser.parseReader(reader).getAsJsonObject();
             if (!obj.has("better_display") || !obj.get("better_display").isJsonObject()) return;
 
-            Path rel = Cadvancements.ADVANCEMENTS_DIR.relativize(file);
-            if (rel.getNameCount() < 2) return;
+            Path relativePath = CustomAdvancements.ADVANCEMENTS_DIR.relativize(file);
+            if (relativePath.getNameCount() < 2) return;
 
             StringBuilder path = new StringBuilder();
-            for (int i = 1; i < rel.getNameCount(); i++) {
-                if (path.length() > 0) path.append('/');
-                String seg = rel.getName(i).toString();
-                if (i == rel.getNameCount() - 1) {
+            for (int i = 1; i < relativePath.getNameCount(); i++) {
+                if (!path.isEmpty()) path.append('/');
+                String seg = relativePath.getName(i).toString();
+                if (i == relativePath.getNameCount() - 1) {
                     seg = seg.substring(0, seg.lastIndexOf('.'));
                 }
                 path.append(seg);
             }
-            Identifier id = Identifier.fromNamespaceAndPath(rel.getName(0).toString(), path.toString());
+            Identifier id = Identifier.fromNamespaceAndPath(relativePath.getName(0).toString(), path.toString());
             DATA.put(id, obj.getAsJsonObject("better_display"));
-            //Cadvancements.getLogger().info("[CADV] better_display loaded for " + id);
+            //CustomAdvancements.getLogger().info("[CADV] better_display loaded for " + id);
         } catch (Exception e) {
-            Cadvancements.getLogger().error("Ошибка чтения {}: {}", file, e.getMessage());
+            CustomAdvancements.getLogger().error("Ошибка чтения {}: {}", file, e.getMessage());
         }
     }
 }

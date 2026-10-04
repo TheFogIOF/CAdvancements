@@ -1,6 +1,6 @@
 package sk.thefogiof.cadvancements.load;
 
-import sk.thefogiof.cadvancements.Cadvancements;
+import sk.thefogiof.cadvancements.CustomAdvancements;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -27,7 +27,7 @@ public final class UserAdvancementLoader {
     public static Map<Identifier, Advancement> loadAll(HolderLookup.Provider registries) {
         Map<Identifier, Advancement> result = new HashMap<>();
 
-        Path root = Cadvancements.ADVANCEMENTS_DIR;
+        Path root = CustomAdvancements.ADVANCEMENTS_DIR;
         if (!Files.isDirectory(root)) return result;
 
         try (Stream<Path> stream = Files.walk(root)) {
@@ -37,54 +37,54 @@ public final class UserAdvancementLoader {
                         try {
                             loadSingle(file, registries, result);
                         } catch (Exception e) {
-                            Cadvancements.getLogger().error("Load error {}: {}", file, e.getMessage());
+                            CustomAdvancements.getLogger().error("Load error {}: {}", file, e.getMessage());
                         }
                     });
         } catch (IOException e) {
-            Cadvancements.getLogger().error("Cant scan folder {}", String.valueOf(e));
+            CustomAdvancements.getLogger().error("Cant scan folder {}", String.valueOf(e));
         }
         return result;
     }
 
-    private static boolean isSupported(Path p) {
-        String n = p.getFileName().toString().toLowerCase(Locale.ROOT);
-        return EXTENSIONS.stream().anyMatch(n::endsWith);
+    private static boolean isSupported(Path path) {
+        String name = path.getFileName().toString().toLowerCase(Locale.ROOT);
+        return EXTENSIONS.stream().anyMatch(name::endsWith);
     }
 
     private static void loadSingle(Path file, HolderLookup.Provider registries, Map<Identifier, Advancement> target) throws IOException {
-        Path rel = Cadvancements.ADVANCEMENTS_DIR.relativize(file);
-        if (rel.getNameCount() < 2) {
-            Cadvancements.getLogger().warn("File in root without namespace: " + rel);
+        Path relativePath = CustomAdvancements.ADVANCEMENTS_DIR.relativize(file);
+        if (relativePath.getNameCount() < 2) {
+            CustomAdvancements.getLogger().warn("File in root without namespace: {}", relativePath);
             return;
         }
 
-        String ns = rel.getName(0).toString();
-        if (!Identifier.isValidNamespace(ns)) {
-            Cadvancements.getLogger().warn("Invalid namespace '" + ns + "': " + rel);
+        String namespace = relativePath.getName(0).toString();
+        if (!Identifier.isValidNamespace(namespace)) {
+            CustomAdvancements.getLogger().warn("Invalid namespace '{}': {}", namespace, relativePath);
             return;
         }
 
         StringBuilder path = new StringBuilder();
-        for (int i = 1; i < rel.getNameCount(); i++) {
-            if (path.length() > 0) path.append('/');
-            String seg = rel.getName(i).toString();
-            if (i == rel.getNameCount() - 1) {
+        for (int i = 1; i < relativePath.getNameCount(); i++) {
+            if (!path.isEmpty()) path.append('/');
+            String seg = relativePath.getName(i).toString();
+            if (i == relativePath.getNameCount() - 1) {
                 seg = stripExt(seg);
             }
             path.append(seg);
         }
 
-        Identifier id = Identifier.fromNamespaceAndPath(ns, path.toString());
+        Identifier id = Identifier.fromNamespaceAndPath(namespace, path.toString());
         String raw = Files.readString(file, StandardCharsets.UTF_8);
 
         JsonElement parsed;
         try { parsed = JsonParser.parseString(raw); }
         catch (Exception e) {
-            Cadvancements.getLogger().error("Invalid JSON in {}: {}", file, e.getMessage());
+            CustomAdvancements.getLogger().error("Invalid JSON in {}: {}", file, e.getMessage());
             return;
         }
         if (!parsed.isJsonObject()) {
-            Cadvancements.getLogger().warn("{} - not JSON-Object", file);
+            CustomAdvancements.getLogger().warn("{} - not JSON-Object", file);
             return;
         }
 
@@ -96,7 +96,7 @@ public final class UserAdvancementLoader {
                 .getOrThrow(msg -> new IOException("CODEC error: " + msg));
 
         target.put(id, advancement);
-        //Cadvancements.getLogger().info("Loaded: " + id);
+        //CustomAdvancements.getLogger().info("Loaded: " + id);
     }
 
     private static String stripExt(String s) {

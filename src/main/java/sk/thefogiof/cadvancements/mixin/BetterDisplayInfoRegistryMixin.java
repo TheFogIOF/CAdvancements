@@ -14,9 +14,9 @@ import sk.thefogiof.cadvancements.compat.BetterDisplayRegistry;
 public abstract class BetterDisplayInfoRegistryMixin {
 
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
-    private void cadv$inject(AdvancementHolder holder, CallbackInfoReturnable<BetterDisplayInfo> cir) {
-        JsonObject raw = BetterDisplayRegistry.get(holder.id());
+    private void cadv$inject(AdvancementHolder advancementHolder, CallbackInfoReturnable<BetterDisplayInfo> cir) {
+        JsonObject raw = BetterDisplayRegistry.get(advancementHolder.id());
         if (raw == null) return;
-        cir.setReturnValue(new BetterDisplayInfo(holder.id(), raw));
+        cir.setReturnValue(new BetterDisplayInfo(advancementHolder.id(), raw));
     }
 }

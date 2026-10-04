@@ -23,29 +23,18 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(ResourceKeyArgument.class)
 public class ResourceKeyArgumentMixin {
-
-    /** Имя поля можно проверить в декомпилированном ResourceKeyArgument. */
-    @Shadow
-    @Final
-    private ResourceKey<? extends Registry<?>> registryKey;
+    @Shadow @Final private ResourceKey<? extends Registry<?>> registryKey;
 
     @Inject(method = "listSuggestions", at = @At("HEAD"), cancellable = true)
-    private <S> void cadv$injectSuggestions(CommandContext<S> context,
-                                            SuggestionsBuilder builder,
-                                            CallbackInfoReturnable<CompletableFuture<Suggestions>> cir) {
-        // Только для аргумента-достижения. Для структур/рецептов/шаблонов — пусть ванила работает как обычно.
+    private <S> void cadv$injectSuggestions(CommandContext<S> context, SuggestionsBuilder builder, CallbackInfoReturnable<CompletableFuture<Suggestions>> cir) {
         if (!Registries.ADVANCEMENT.equals(this.registryKey)) return;
         if (!(context.getSource() instanceof CommandSourceStack source)) return;
 
-        // Собираем все ID (ванильные + наши — getAllAdvancements() возвращает уже объединённую карту).
         List<String> ids = new ArrayList<>();
-        for (AdvancementHolder h : source.getServer().getAdvancements().getAllAdvancements()) {
-            ids.add(h.id().toString());
+        for (AdvancementHolder holder : source.getServer().getAdvancements().getAllAdvancements()) {
+            ids.add(holder.id().toString());
         }
 
-        // SharedSuggestionProvider сам отфильтрует ids по текущему вводу пользователя
-        // и вернёт корректный CompletableFuture<Suggestions>. Это именно тот метод,
-        // которым пользуется сама ванила для подсказок критериев.
         cir.setReturnValue(SharedSuggestionProvider.suggest(ids, builder));
     }
 }

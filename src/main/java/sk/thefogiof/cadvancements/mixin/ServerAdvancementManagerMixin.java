@@ -1,19 +1,16 @@
 package sk.thefogiof.cadvancements.mixin;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementTree;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.ServerAdvancementManager;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import sk.thefogiof.cadvancements.Cadvancements;
+import sk.thefogiof.cadvancements.CustomAdvancements;
 import sk.thefogiof.cadvancements.load.UserAdvancementLoader;
 
 import java.util.*;
@@ -29,21 +26,16 @@ public class ServerAdvancementManagerMixin {
         if (userAdvancements.isEmpty()) return;
 
         Map<Identifier, AdvancementHolder> merged = new HashMap<>(this.advancements);
-        for (Map.Entry<Identifier, Advancement> e : userAdvancements.entrySet()) {
-            merged.put(e.getKey(), new AdvancementHolder(e.getKey(), e.getValue()));
+        for (Map.Entry<Identifier, Advancement> entry : userAdvancements.entrySet()) {
+            merged.put(entry.getKey(), new AdvancementHolder(entry.getKey(), entry.getValue()));
         }
         this.advancements = merged;
-/*
-        for (Map.Entry<Identifier, Advancement> e : userAdvancements.entrySet()) {
-            this.advancements.put(e.getKey(), new AdvancementHolder(e.getKey(), e.getValue()));
-        }
-*/
 
         AdvancementTree newTree = new AdvancementTree();
         newTree.addAll(this.advancements.values());
         newTree.repositionNodes();
         this.tree = newTree;
 
-        Cadvancements.getLogger().info("Added {} user advancements.", userAdvancements.size());
+        CustomAdvancements.getLogger().info("Added {} user advancements.", userAdvancements.size());
     }
 }

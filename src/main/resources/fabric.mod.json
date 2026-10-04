@@ -17,7 +17,7 @@
       "sk.thefogiof.cadvancements.client.CadvancementsClient"
     ],
     "main": [
-      "sk.thefogiof.cadvancements.Cadvancements"
+      "sk.thefogiof.cadvancements.CustomAdvancements"
     ]
   },
   "mixins": [
